@@ -1,1 +1,32 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install PHP and dependencies
+       run: |
+       choco install php
+       php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+       php composer-setup.php
+       php composer install
+
+
+      - name: Run unit tests
+        run: |
+          vendor/bin/phpunit tests
+
+      - name: Build Docker image
+        uses: docker/build-push-action
+        with:
+          push: true
+          tags: jenkins/StoreShop:latest
+
 
